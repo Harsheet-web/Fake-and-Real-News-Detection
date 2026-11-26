@@ -9,6 +9,9 @@ from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from nltk.stem import PorterStemmer
 
+import csv
+import io
+
 st.set_page_config(
     page_title="Fake News Detector",
     page_icon="📰",
@@ -261,6 +264,35 @@ if st.session_state.prediction_history:
                 f"**Confidence:** "
                 f"{record['confidence']:.2%}"
             )
+        # Download prediction history as CSV
+
+        csv_buffer = io.StringIO()
+
+        fieldnames = [
+            "article",
+            "prediction",
+            "confidence",
+            "fake_probability",
+            "real_probability"
+        ]
+
+        writer = csv.DictWriter(
+            csv_buffer,
+            fieldnames=fieldnames
+        )
+
+        writer.writeheader()
+
+        writer.writerows(
+            st.session_state.prediction_history
+        )
+
+        st.download_button(
+            label="📥 Download Prediction History (CSV)",
+            data=csv_buffer.getvalue(),
+            file_name="fake_news_prediction_history.csv",
+            mime="text/csv"
+        )
 
 else:
 
